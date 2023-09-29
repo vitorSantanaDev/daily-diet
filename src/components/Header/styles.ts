@@ -1,14 +1,16 @@
 import { Image } from "react-native";
 
-import styled from "styled-components/native";
+import styled, { css } from "styled-components/native";
 
 export const Container = styled.View`
-	width: 100%;
-	padding-top: 8px;
-	padding-left: 24px;
-	padding-right: 24px;
-	flex-direction: row;
-	justify-content: space-between;
+	${({ theme }) => css`
+		width: 100%;
+		flex-direction: row;
+		justify-content: space-between;
+		padding-top: ${theme.METRICS.pixel(8)}px;
+		padding-left: ${theme.METRICS.pixel(24)}px;
+		padding-right: ${theme.METRICS.pixel(24)}px;
+	`}
 `;
 
 export const UserPhoto = styled(Image).attrs(({ theme }) => ({

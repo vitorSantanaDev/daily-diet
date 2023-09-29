@@ -57,5 +57,10 @@ export default {
 		XL: 24,
 		HG: 32,
 	},
+	LINE_HEIGHT: "130%",
+	BORDER_RADIUS: {
+		CARD: 8,
+		BUTTON: 6,
+	},
 	METRICS: { pixel },
 };

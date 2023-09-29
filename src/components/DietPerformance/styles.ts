@@ -18,7 +18,7 @@ export const Container = styled(TouchableOpacity)<DietPerformanceStylesProps>`
 	align-items: center;
 	justify-content: center;
 	border-radius: ${({ theme }) =>
-		theme.METRICS.pixel(theme.BORDER_RADIUS.CARD)};
+		theme.METRICS.pixel(theme.BORDER_RADIUS.CARD)}px;
 `;
 
 export const PercentageText = styled.Text`
