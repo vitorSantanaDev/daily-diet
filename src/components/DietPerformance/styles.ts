@@ -25,7 +25,7 @@ export const PercentageText = styled.Text`
 	${({ theme }) => css`
 		text-align: center;
 		max-width: 100%;
-		font-size: ${theme.FONT_SIZE.HG}px;
+		font-size: ${theme.METRICS.pixel(theme.FONT_SIZE.HG)}px;
 		font-family: ${theme.FONT_FAMILY.BOLD};
 	`}
 `;
@@ -34,7 +34,7 @@ export const Description = styled.Text`
 	${({ theme }) => css`
 		text-align: center;
 		max-width: 100%;
-		font-size: ${theme.FONT_SIZE.SM}px;
+		font-size: ${theme.METRICS.pixel(theme.FONT_SIZE.SM)}px;
 		font-family: ${theme.FONT_FAMILY.REGULAR};
 	`}
 `;

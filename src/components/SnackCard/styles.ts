@@ -16,7 +16,7 @@ export const Container = styled(TouchableOpacity)`
 
 export const Time = styled.Text`
 	${({ theme }) => css`
-		font-size: ${theme.FONT_SIZE.XSM}px;
+		font-size: ${theme.METRICS.pixel(theme.FONT_SIZE.XSM)}px;
 		color: ${theme.COLORS.GRAY_700};
 		font-family: ${theme.FONT_FAMILY.BOLD};
 	`}
@@ -39,7 +39,7 @@ export const Row = styled.View`
 export const MealName = styled.Text`
 	${({ theme }) => css`
 		max-width: ${theme.METRICS.pixel(200)}px;
-		font-size: ${theme.FONT_SIZE.MD}px;
+		font-size: ${theme.METRICS.pixel(theme.FONT_SIZE.MD)}px;
 		color: ${theme.COLORS.GRAY_600};
 		font-family: ${theme.FONT_FAMILY.REGULAR};
 	`}
