@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { Button } from "@components/Button";
 import { TextInputComponent } from "@components/TextInputComponent";
+import { ScreenDetailsWrapper } from "@components/ScreenDetailsWrapper";
 
 import { useErros } from "@hooks/useErros";
 import { dateMask, hourMask } from "@utils/masks";
@@ -115,102 +116,83 @@ export function CreateNewMeal() {
 	useEffect(feedbackWhenFormError, [formIsValid]);
 
 	return (
-		<>
-			<ScrollView
-				scrollEnabled={false}
-				contentContainerStyle={{ flex: 1 }}
-				style={styles.container}
-			>
-				<S.StatusBarStyles />
-				<S.Header>
-					<S.Title>Nova Refeição</S.Title>
-					<S.BackContainer onPress={handleGoBack}>
-						<S.ArrowLeftIcon />
-					</S.BackContainer>
-				</S.Header>
-				<S.Content>
-					<S.Wrapper>
-						<S.Form>
+		<ScreenDetailsWrapper title="Nova Refeição" onGoBack={handleGoBack}>
+			<S.Wrapper>
+				<S.Form>
+					<TextInputComponent
+						label="Nome"
+						onChangeText={handleChangeName}
+						errorMessage={errors.find((err) => err.field === "name")?.message}
+					/>
+					<S.DescriptionFieldWrapper>
+						<TextInputComponent
+							multiline
+							label="Descrição"
+							style={{ height: METRICS.pixel(120) }}
+							onChangeText={handleChangeDescription}
+							errorMessage={
+								errors.find((err) => err.field === "description")?.message
+							}
+						/>
+					</S.DescriptionFieldWrapper>
+					<S.RowWrapper>
+						<View style={{ flex: 1 }}>
 							<TextInputComponent
-								label="Nome"
-								onChangeText={handleChangeName}
+								label="Data"
+								maxLength={10}
+								onChangeText={handleChangeDate}
+								value={dateMask(formValues.date)}
 								errorMessage={
-									errors.find((err) => err.field === "name")?.message
+									errors.find((err) => err.field === "date")?.message
 								}
 							/>
-							<S.DescriptionFieldWrapper>
-								<TextInputComponent
-									multiline
-									label="Descrição"
-									style={{ height: METRICS.pixel(120) }}
-									onChangeText={handleChangeDescription}
-									errorMessage={
-										errors.find((err) => err.field === "description")?.message
-									}
-								/>
-							</S.DescriptionFieldWrapper>
-							<S.RowWrapper>
-								<View style={{ flex: 1 }}>
-									<TextInputComponent
-										label="Data"
-										maxLength={10}
-										onChangeText={handleChangeDate}
-										value={dateMask(formValues.date)}
-										errorMessage={
-											errors.find((err) => err.field === "date")?.message
-										}
-									/>
-								</View>
-								<View style={{ flex: 1 }}>
-									<TextInputComponent
-										label="Hora"
-										maxLength={5}
-										onChangeText={handleChangeHour}
-										value={hourMask(formValues.hour)}
-										errorMessage={
-											errors.find((err) => err.field === "hour")?.message
-										}
-									/>
-								</View>
-							</S.RowWrapper>
-							<S.MealTypeOptionsWrapper>
-								<S.MealTypeSelectLabel>
-									Está dentro da dieta?
-								</S.MealTypeSelectLabel>
-								<S.RowWrapper>
-									<View style={{ flex: 1 }}>
-										<S.MealTypeOption
-											type={formValues.mealType}
-											isSelected={formValues.mealType === "YES"}
-											onPress={() => handleYesOrNoToMealWithinTheDiet("YES")}
-										>
-											<S.CircleIndicatorGreen />
-											<S.MealTypeText>Sim</S.MealTypeText>
-										</S.MealTypeOption>
-									</View>
-									<View style={{ flex: 1 }}>
-										<S.MealTypeOption
-											type={formValues.mealType}
-											isSelected={formValues.mealType === "NO"}
-											onPress={() => handleYesOrNoToMealWithinTheDiet("NO")}
-										>
-											<S.CircleIndicatorRed />
-											<S.MealTypeText>Não</S.MealTypeText>
-										</S.MealTypeOption>
-									</View>
-								</S.RowWrapper>
-							</S.MealTypeOptionsWrapper>
-						</S.Form>
-						<Button
-							disabled={!formIsValid}
-							label="Cadastrar Refeição"
-							style={{ backgroundColor: COLORS.GRAY_600 }}
-							onPress={submit}
-						/>
-					</S.Wrapper>
-				</S.Content>
-			</ScrollView>
-		</>
+						</View>
+						<View style={{ flex: 1 }}>
+							<TextInputComponent
+								label="Hora"
+								maxLength={5}
+								onChangeText={handleChangeHour}
+								value={hourMask(formValues.hour)}
+								errorMessage={
+									errors.find((err) => err.field === "hour")?.message
+								}
+							/>
+						</View>
+					</S.RowWrapper>
+					<S.MealTypeOptionsWrapper>
+						<S.MealTypeSelectLabel>Está dentro da dieta?</S.MealTypeSelectLabel>
+						<S.RowWrapper>
+							<View style={{ flex: 1 }}>
+								<S.MealTypeOption
+									type={formValues.mealType}
+									isSelected={formValues.mealType === "YES"}
+									onPress={() => handleYesOrNoToMealWithinTheDiet("YES")}
+								>
+									<S.CircleIndicatorGreen />
+									<S.MealTypeText>Sim</S.MealTypeText>
+								</S.MealTypeOption>
+							</View>
+							<View style={{ flex: 1 }}>
+								<S.MealTypeOption
+									type={formValues.mealType}
+									isSelected={formValues.mealType === "NO"}
+									onPress={() => handleYesOrNoToMealWithinTheDiet("NO")}
+								>
+									<S.CircleIndicatorRed />
+									<S.MealTypeText>Não</S.MealTypeText>
+								</S.MealTypeOption>
+							</View>
+						</S.RowWrapper>
+					</S.MealTypeOptionsWrapper>
+				</S.Form>
+				<Button
+					disabled={!formIsValid}
+					label="Cadastrar Refeição"
+					style={{ backgroundColor: COLORS.GRAY_600 }}
+					onPress={submit}
+				/>
+			</S.Wrapper>
+		</ScreenDetailsWrapper>
 	);
 }
 
