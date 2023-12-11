@@ -24,6 +24,12 @@
 			],
 			"@utils/*": [
 				"./src/utils/*"
+			],
+			"@interfaces/*": [
+				"./src/entities/*"
+			],
+			"@hooks/*": [
+				"./src/hooks/*"
 			]
 		}
 	}
