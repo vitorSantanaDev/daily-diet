@@ -1,4 +1,5 @@
 import { TextInputProps } from "react-native";
+
 import * as S from "./styles";
 
 export type BaseTextInputProps = TextInputProps & {

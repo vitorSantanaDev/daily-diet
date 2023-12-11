@@ -1,3 +1,3 @@
-import { TextInputControlled as TextInputComponent } from "./TextInputControlled";
+import { BaseTextInput as TextInputComponent } from "./BaseTextInput";
 
 export { TextInputComponent };
