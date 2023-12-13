@@ -26,6 +26,7 @@ import { useMeals } from "@storage/meals/useMeals";
 import { IMeal } from "@interfaces/meal.interface";
 
 import * as S from "./styles";
+import { Placeholder } from "@components/Placeholder";
 
 export function Home() {
 	const { top } = useSafeAreaInsets();
@@ -117,9 +118,9 @@ export function Home() {
 								style={{ marginBottom: METRICS.pixel(36) }}
 								onPress={() => navigation.navigate(RoutesName.STATISTICS)}
 							/>
-							<S.Meals>Meals</S.Meals>
+							<S.Meals>Refeições</S.Meals>
 							<Button
-								label="New meal"
+								label="Nova refeição"
 								icon={
 									<Plus
 										weight="bold"
@@ -130,6 +131,9 @@ export function Home() {
 								onPress={handleGoToScreenForCreatingANewMeal}
 							/>
 							<SectionList
+								ListEmptyComponent={
+									<Placeholder description="Parece que você ainda não tem refeições cadastradas. Cadastre sua primeira refeição clicando no botão acima!" />
+								}
 								style={{ paddingVertical: METRICS.pixel(32) }}
 								sections={sectionListData}
 								ItemSeparatorComponent={() => (
