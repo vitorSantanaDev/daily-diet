@@ -1,7 +1,8 @@
 import { View } from "react-native";
 import { useTheme } from "styled-components/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { ETypeOfMeal } from "@interfaces/snack.interface";
+import { ETypeOfMeal } from "@interfaces/meal.interface";
 
 import NewMealHappyFeedbackIllustration from "@assets/images/new_meal_happy_feedback_Illustration.svg";
 import NewMealSadFeedbackIllustration from "@assets/images/new_meal_sad_feedback_Illustration.svg";
@@ -9,7 +10,6 @@ import NewMealSadFeedbackIllustration from "@assets/images/new_meal_sad_feedback
 import { Button } from "@components/Button";
 
 import * as S from "./styles";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 export function NewMealFeedback() {
 	const {

@@ -1,4 +1,4 @@
-import { ETypeOfMeal } from "@interfaces/snack.interface";
+import { ETypeOfMeal } from "@interfaces/meal.interface";
 import styled, { css } from "styled-components/native";
 
 export const Wrapper = styled.View`
