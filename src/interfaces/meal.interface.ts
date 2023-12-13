@@ -3,12 +3,12 @@ export enum ETypeOfMeal {
 	MEAL_OUTSIDE_THE_DIET = "MEAL_OUTSIDE_THE_DIET",
 }
 
-export interface ISnack {
+export interface IMeal {
 	time: string;
-	createdAt: string;
+	createdAt?: string;
 	name: string;
 	type: ETypeOfMeal;
 	description: string;
 	date: string;
-	ID: string;
+	ID?: string;
 }

@@ -1,4 +1,4 @@
-import { ISnack } from "@interfaces/snack.interface";
+import { IMeal } from "@interfaces/meal.interface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MEALS_COLLECTION } from "@storage/storage-config";
 
@@ -7,7 +7,7 @@ export function useMeals() {
 		try {
 			const storage = await AsyncStorage.getItem(MEALS_COLLECTION);
 
-			const meals: ISnack[] = storage ? JSON.parse(storage) : [];
+			const meals: IMeal[] = storage ? JSON.parse(storage) : [];
 
 			return meals;
 		} catch (err) {
@@ -15,7 +15,7 @@ export function useMeals() {
 		}
 	}
 
-	async function mealCreate(meal: ISnack) {
+	async function mealCreate(meal: IMeal) {
 		try {
 			const storedMeals = await getAllMeals();
 
@@ -33,13 +33,32 @@ export function useMeals() {
 		}
 	}
 
-	async function mealDelete(mealID: string) {
+	async function mealUpdate(meal: IMeal) {
 		try {
+			const { description, date, name, time, type } = meal;
+
 			const storedMeals = await getAllMeals();
 
-			const filteredMeals = storedMeals.filter((m) => m.ID !== mealID);
+			const mealAlreadyExists = storedMeals.findIndex((m) => m.ID === meal.ID);
 
-			const storageMeal = JSON.stringify(filteredMeals);
+			if (mealAlreadyExists === -1) {
+				throw new Error(`Meal ${meal.name} does not exists`);
+			}
+
+			const mealTobeUpdated = storedMeals[mealAlreadyExists];
+
+			const updatedMeal: IMeal = {
+				...mealTobeUpdated,
+				description,
+				date,
+				name,
+				time,
+				type,
+			};
+
+			storedMeals.splice(mealAlreadyExists, 1, updatedMeal);
+
+			const storageMeal = JSON.stringify([...storedMeals]);
 
 			await AsyncStorage.setItem(MEALS_COLLECTION, storageMeal);
 		} catch (err) {
@@ -47,5 +66,19 @@ export function useMeals() {
 		}
 	}
 
-	return { getAllMeals, mealCreate, mealDelete };
+	async function mealDelete(mealID: string) {
+		try {
+			const storedMeals = await getAllMeals();
+
+			const filteredMeals = storedMeals.filter((m) => m.ID !== mealID);
+
+			const storageMeal = JSON.stringify([...filteredMeals]);
+
+			await AsyncStorage.setItem(MEALS_COLLECTION, storageMeal);
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	return { getAllMeals, mealCreate, mealDelete, mealUpdate };
 }

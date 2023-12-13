@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "styled-components/native";
 
 import { useErros } from "@hooks/useErros";
@@ -9,7 +9,7 @@ import { Button } from "@components/Button";
 import { TextInputComponent } from "@components/TextInputComponent";
 import { ScreenDetailsWrapper } from "@components/ScreenDetailsWrapper";
 
-import { ETypeOfMeal } from "@interfaces/snack.interface";
+import { ETypeOfMeal } from "@interfaces/meal.interface";
 
 import * as Haptics from "expo-haptics";
 import * as S from "./styles";
@@ -51,6 +51,17 @@ export function MealFormTemplate({
 
 	const { METRICS } = useTheme();
 	const { setError, errors, removeError } = useErros();
+
+	const isEditingAndTheNewValuesAreTheSameAsTheOldValues = useMemo(() => {
+		if (!defautlValues) return false;
+		return (
+			defautlValues.name === formValues.name &&
+			defautlValues.description === formValues.description &&
+			defautlValues.date === formValues.date &&
+			defautlValues.hour === formValues.hour &&
+			defautlValues.mealType === formValues.mealType
+		);
+	}, [defautlValues, formValues]);
 
 	async function handleSubmit() {
 		onSubmit({
@@ -123,6 +134,7 @@ export function MealFormTemplate({
 				<S.Form>
 					<TextInputComponent
 						label="Nome"
+						value={formValues.name}
 						onChangeText={handleChangeName}
 						errorMessage={errors.find((err) => err.field === "name")?.message}
 					/>
@@ -130,6 +142,7 @@ export function MealFormTemplate({
 						<TextInputComponent
 							multiline
 							label="Descrição"
+							value={formValues.description}
 							style={{ height: METRICS.pixel(120) }}
 							onChangeText={handleChangeDescription}
 							errorMessage={
@@ -188,7 +201,9 @@ export function MealFormTemplate({
 					</S.MealTypeOptionsWrapper>
 				</S.Form>
 				<Button
-					disabled={!formIsValid}
+					disabled={
+						!formIsValid || isEditingAndTheNewValuesAreTheSameAsTheOldValues
+					}
 					label={buttonSubmitLabel}
 					onPress={handleSubmit}
 				/>

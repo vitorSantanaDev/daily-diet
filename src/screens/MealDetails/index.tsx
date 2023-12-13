@@ -9,7 +9,7 @@ import { Dialog } from "@components/Dialog";
 import { ScreenDetailsWrapper } from "@components/ScreenDetailsWrapper";
 
 import { useMeals } from "@storage/meals/useMeals";
-import { ETypeOfMeal, ISnack } from "@interfaces/snack.interface";
+import { ETypeOfMeal, IMeal } from "@interfaces/meal.interface";
 
 import * as S from "./styles";
 
@@ -20,7 +20,7 @@ export function MealDetails() {
 	const { METRICS, COLORS } = useTheme();
 
 	const route = useRoute();
-	const { meal } = route.params as { meal: ISnack };
+	const { meal } = route.params as { meal: IMeal };
 
 	const navigation = useNavigation();
 
@@ -40,10 +40,14 @@ export function MealDetails() {
 		setShowDialogConfirmDeleteMeal(true);
 	}
 
-	function handleConfirmDeleteMeal(mealID: string) {
-		mealDelete(mealID);
+	async function handleConfirmDeleteMeal(mealID: string) {
+		await mealDelete(mealID);
 		setShowDialogConfirmDeleteMeal(false);
 		navigation.navigate("home");
+	}
+
+	function goToEditMealScreen() {
+		navigation.navigate("edit_meal", { meal });
 	}
 
 	return (
@@ -71,6 +75,7 @@ export function MealDetails() {
 								/>
 							}
 							label="Editar refeição"
+							onPress={goToEditMealScreen}
 						/>
 						<Button
 							type="OUTLINE"
@@ -85,7 +90,7 @@ export function MealDetails() {
 				isVisible={showDialogConfirmDeleteMeal}
 				onClose={() => setShowDialogConfirmDeleteMeal(false)}
 				title="Deseja realmente excluir o registro da refeição?"
-				onActionConfirm={() => handleConfirmDeleteMeal(meal.ID)}
+				onActionConfirm={() => handleConfirmDeleteMeal(String(meal.ID))}
 			/>
 		</>
 	);

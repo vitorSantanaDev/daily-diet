@@ -26,7 +26,7 @@
 				"./src/utils/*"
 			],
 			"@interfaces/*": [
-				"./src/entities/*"
+				"./src/interfaces/*"
 			],
 			"@hooks/*": [
 				"./src/hooks/*"
