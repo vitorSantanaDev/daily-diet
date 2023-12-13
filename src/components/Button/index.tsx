@@ -14,13 +14,16 @@ export function Button({
 	icon,
 	label,
 	type = "PRIMARY",
+	disabled,
 	...restProps
 }: ButtonProps) {
 	const { METRICS } = useTheme();
 	return (
-		<S.Container buttonType={type} {...restProps}>
+		<S.Container disabled={disabled} buttonType={type} {...restProps}>
 			{!!icon && <View style={{ marginRight: METRICS.pixel(12) }}>{icon}</View>}
-			<S.ButtonText buttonType={type}>{label}</S.ButtonText>
+			<S.ButtonText disabled={disabled} buttonType={type}>
+				{label}
+			</S.ButtonText>
 		</S.Container>
 	);
 }
