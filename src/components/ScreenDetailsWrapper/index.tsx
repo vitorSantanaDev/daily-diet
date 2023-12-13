@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ScrollView, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import theme from "@theme/index";
 
@@ -8,16 +9,16 @@ import * as S from "./styles";
 type ScreenDetailsWrapperProps = {
 	title: string;
 	backgroundColor?: keyof typeof theme.COLORS;
-	onGoBack: () => void;
 	children: ReactNode;
 };
 
 export function ScreenDetailsWrapper({
 	title,
 	children,
-	onGoBack,
 	backgroundColor = "GRAY_300",
 }: ScreenDetailsWrapperProps) {
+	const navigation = useNavigation();
+
 	return (
 		<ScrollView
 			scrollEnabled={false}
@@ -27,7 +28,7 @@ export function ScreenDetailsWrapper({
 			<S.StatusBarStyles />
 			<S.Header backgroundColor={backgroundColor}>
 				<S.Title>{title}</S.Title>
-				<S.BackContainer onPress={onGoBack}>
+				<S.BackContainer onPress={navigation.goBack}>
 					<S.ArrowLeftIcon />
 				</S.BackContainer>
 			</S.Header>
