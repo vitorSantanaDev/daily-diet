@@ -8,5 +8,7 @@ export interface ISnack {
 	createdAt: string;
 	name: string;
 	type: ETypeOfMeal;
+	description: string;
+	date: string;
 	ID: string;
 }
