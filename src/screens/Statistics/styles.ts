@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components/native";
-import { ScrollView, StatusBar } from "react-native";
+import { StatusBar, View } from "react-native";
 import { ArrowLeft } from "phosphor-react-native";
 import theme from "@theme/index";
 
@@ -39,7 +39,7 @@ export const Description = styled.Text`
 	`}
 `;
 
-export const GeneralStatisticsWrapper = styled(ScrollView).attrs(() => ({
+export const GeneralStatisticsWrapper = styled(View).attrs(() => ({
 	style: {
 		shadowColor: "rgba(0,0,0,0.5)",
 		shadowOffset: {

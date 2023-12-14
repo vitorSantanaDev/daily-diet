@@ -5,34 +5,29 @@ import {
 	SafeAreaView,
 	SectionList,
 } from "react-native";
+import { useCallback, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { Plus } from "phosphor-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from "styled-components/native";
-import {
-	useFocusEffect,
-	useIsFocused,
-	useNavigation,
-} from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { SnackCard } from "@components/SnackCard";
+import { Placeholder } from "@components/Placeholder";
 import { DietPerformance } from "@components/DietPerformance";
 
 import { RoutesName } from "@routes/routes-name";
 import { useMeals } from "@storage/meals/useMeals";
-import { IMeal } from "@interfaces/meal.interface";
+import { ETypeOfMeal, IMeal } from "@interfaces/meal.interface";
 
 import * as S from "./styles";
-import { Placeholder } from "@components/Placeholder";
 
 export function Home() {
 	const { top } = useSafeAreaInsets();
 
 	const navigation = useNavigation();
-	const isFocused = useIsFocused();
 
 	const styles = StyleSheet.create({
 		container: {
@@ -46,12 +41,64 @@ export function Home() {
 
 	const [mealsStored, setMealsStored] = useState<IMeal[]>([]);
 
+	function calculatePercentageOfMealsWithinTheDiet(meals: IMeal[]): number {
+		const totalMeals = meals.length;
+
+		if (!totalMeals) return 0;
+
+		let dietMeals = 0;
+
+		for (const meal of meals) {
+			if (meal.type === ETypeOfMeal.MEAL_WITHIN_THE_DIET) {
+				dietMeals++;
+			}
+		}
+
+		return (dietMeals / totalMeals) * 100;
+	}
+
+	const percentageOfMealsWithinTheDiet = useMemo(() => {
+		return calculatePercentageOfMealsWithinTheDiet(mealsStored);
+	}, [mealsStored]);
+
+	function findBestSequenceOfDishesWhitinTheDiet(meals: IMeal[]): number {
+		let maxSequence = 0;
+		let currentSequence = 0;
+
+		for (const meal of meals) {
+			if (meal.type === ETypeOfMeal.MEAL_WITHIN_THE_DIET) {
+				currentSequence++;
+			} else {
+				maxSequence = Math.max(maxSequence, currentSequence);
+				currentSequence = 0;
+			}
+		}
+
+		return Math.max(maxSequence, currentSequence);
+	}
+
+	const bestSequenceOfDishesWhitinTheDiet = useMemo(() => {
+		return findBestSequenceOfDishesWhitinTheDiet(mealsStored);
+	}, [mealsStored]);
+
+	const totalMealsOutsideTheDiet = useMemo(() => {
+		return mealsStored.filter(
+			(meal) => meal.type === ETypeOfMeal.MEAL_OUTSIDE_THE_DIET
+		).length;
+	}, [mealsStored]);
+
+	const totalMealsWithinTheDiet = useMemo(() => {
+		return mealsStored.filter(
+			(meal) => meal.type === ETypeOfMeal.MEAL_WITHIN_THE_DIET
+		).length;
+	}, [mealsStored]);
+
 	const meals = useMemo(() => {
 		const result: { day: string; meals: IMeal[] }[] = [];
 
 		for (const meal of mealsStored) {
 			const alreadyExistingItemIndex = result.findIndex(
-				(i) => i.day === meal.createdAt
+				(i) => i.day.replace(/T.*/, "") === meal.createdAt?.replace(/T.*/, "")
 			);
 
 			if (alreadyExistingItemIndex !== -1) {
@@ -93,6 +140,18 @@ export function Home() {
 		navigation.navigate("meal_details", { meal });
 	}
 
+	function handleGoToStatistics() {
+		navigation.navigate(RoutesName.STATISTICS, {
+			statistics: {
+				percentageOfMealsWithinTheDiet,
+				bestSequenceOfDishesWhitinTheDiet,
+				totalMealsRecorded: mealsStored.length,
+				totalMealsOutsideTheDiet,
+				totalMealsWithinTheDiet,
+			},
+		});
+	}
+
 	useFocusEffect(
 		useCallback(() => {
 			getMealsStored();
@@ -113,10 +172,10 @@ export function Home() {
 					renderItem={() => (
 						<>
 							<DietPerformance
-								percentage={98.99}
+								percentage={percentageOfMealsWithinTheDiet}
 								description="Refeições dentro da dieta"
 								style={{ marginBottom: METRICS.pixel(36) }}
-								onPress={() => navigation.navigate(RoutesName.STATISTICS)}
+								onPress={handleGoToStatistics}
 							/>
 							<S.Meals>Refeições</S.Meals>
 							<Button
