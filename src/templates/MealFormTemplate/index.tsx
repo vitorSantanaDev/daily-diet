@@ -1,4 +1,11 @@
-import { View } from "react-native";
+import {
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	Touchable,
+	TouchableWithoutFeedback,
+	View,
+} from "react-native";
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "styled-components/native";
 
@@ -11,7 +18,6 @@ import { ScreenDetailsWrapper } from "@components/ScreenDetailsWrapper";
 
 import { ETypeOfMeal } from "@interfaces/meal.interface";
 
-import * as Haptics from "expo-haptics";
 import * as S from "./styles";
 
 export type FormValues = {
@@ -47,7 +53,7 @@ export function MealFormTemplate({
 		description: defautlValues?.description || "",
 		mealType: defautlValues?.mealType || "UNSELECTED",
 	});
-	const [formIsValid, setFormIsValid] = useState(false);
+	const [formIsValid, setFormIsValid] = useState(true);
 
 	const { METRICS } = useTheme();
 	const { setError, errors, removeError } = useErros();
@@ -81,42 +87,71 @@ export function MealFormTemplate({
 	}
 
 	function setRequiredFieldError({
-		value,
 		field,
 	}: {
-		value: string;
-		field: string;
+		field: keyof Pick<FormValues, "date" | "hour" | "description" | "name">;
 	}) {
-		if (!value) {
-			setError({ message: "This field is required", field });
-		} else {
-			removeError(field);
-		}
+		setError({ message: "Este campo é obrigatório.", field });
+	}
+
+	function setInvalidInputError({
+		field,
+	}: {
+		field: keyof Pick<FormValues, "date" | "hour">;
+	}) {
+		const fieldTranslated = field === "date" ? "data" : "hora";
+
+		const message = `Por favor, insira uma ${fieldTranslated} válida.`;
+
+		setError({
+			message,
+			field,
+		});
 	}
 
 	function handleChangeName(value: string) {
 		setFormValues((prevState) => ({ ...prevState, name: value }));
-		setRequiredFieldError({ value, field: "name" });
+		if (!value) {
+			setRequiredFieldError({ field: "name" });
+			return;
+		}
+		removeError("name");
 	}
 
 	function handleChangeDescription(value: string) {
 		setFormValues((prevState) => ({ ...prevState, description: value }));
-		setRequiredFieldError({ value, field: "description" });
+		if (!value) {
+			setRequiredFieldError({ field: "description" });
+			return;
+		}
+		removeError("description");
 	}
 
 	function handleChangeDate(value: string) {
 		setFormValues((prevState) => ({ ...prevState, date: value }));
-		setRequiredFieldError({ value, field: "date" });
+		if (!value) {
+			setRequiredFieldError({ field: "date" });
+			return;
+		}
+
+		if (value.length < 10) {
+			setInvalidInputError({ field: "date" });
+			return;
+		}
+		removeError("date");
 	}
 
 	function handleChangeHour(value: string) {
 		setFormValues((prevState) => ({ ...prevState, hour: value }));
-		setRequiredFieldError({ value, field: "hour" });
-	}
-
-	function feedbackWhenFormError() {
-		if (!formIsValid)
-			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+		if (!value) {
+			setRequiredFieldError({ field: "hour" });
+			return;
+		}
+		if (value.length < 5) {
+			setInvalidInputError({ field: "hour" });
+			return;
+		}
+		removeError("hour");
 	}
 
 	useEffect(() => {
@@ -126,88 +161,100 @@ export function MealFormTemplate({
 		);
 	}, [formValues]);
 
-	useEffect(feedbackWhenFormError, [formIsValid]);
-
 	return (
-		<ScreenDetailsWrapper title={title}>
-			<S.Wrapper>
-				<S.Form>
-					<TextInputComponent
-						label="Nome"
-						value={formValues.name}
-						onChangeText={handleChangeName}
-						errorMessage={errors.find((err) => err.field === "name")?.message}
-					/>
-					<S.DescriptionFieldWrapper>
-						<TextInputComponent
-							multiline
-							label="Descrição"
-							value={formValues.description}
-							style={{ height: METRICS.pixel(120) }}
-							onChangeText={handleChangeDescription}
-							errorMessage={
-								errors.find((err) => err.field === "description")?.message
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			keyboardVerticalOffset={-100}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+		>
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+				<ScreenDetailsWrapper title={title}>
+					<S.Wrapper>
+						<S.Form>
+							<TextInputComponent
+								label="Nome"
+								value={formValues.name}
+								onChangeText={handleChangeName}
+								errorMessage={
+									errors.find((err) => err.field === "name")?.message
+								}
+							/>
+							<S.DescriptionFieldWrapper>
+								<TextInputComponent
+									multiline
+									label="Descrição"
+									value={formValues.description}
+									style={{ height: METRICS.pixel(120) }}
+									onChangeText={handleChangeDescription}
+									errorMessage={
+										errors.find((err) => err.field === "description")?.message
+									}
+								/>
+							</S.DescriptionFieldWrapper>
+							<S.RowWrapper>
+								<View style={{ flex: 1 }}>
+									<TextInputComponent
+										label="Data"
+										keyboardType="numeric"
+										maxLength={10}
+										onChangeText={handleChangeDate}
+										value={dateMask(formValues.date)}
+										errorMessage={
+											errors.find((err) => err.field === "date")?.message
+										}
+									/>
+								</View>
+								<View style={{ flex: 1 }}>
+									<TextInputComponent
+										keyboardType="numeric"
+										label="Hora"
+										maxLength={5}
+										onChangeText={handleChangeHour}
+										value={hourMask(formValues.hour)}
+										errorMessage={
+											errors.find((err) => err.field === "hour")?.message
+										}
+									/>
+								</View>
+							</S.RowWrapper>
+							<S.MealTypeOptionsWrapper>
+								<S.MealTypeSelectLabel>
+									Está dentro da dieta?
+								</S.MealTypeSelectLabel>
+								<S.RowWrapper>
+									<View style={{ flex: 1 }}>
+										<S.MealTypeOption
+											type={formValues.mealType}
+											isSelected={formValues.mealType === "YES"}
+											onPress={() => handleYesOrNoToMealWithinTheDiet("YES")}
+										>
+											<S.CircleIndicatorGreen />
+											<S.MealTypeText>Sim</S.MealTypeText>
+										</S.MealTypeOption>
+									</View>
+									<View style={{ flex: 1 }}>
+										<S.MealTypeOption
+											type={formValues.mealType}
+											isSelected={formValues.mealType === "NO"}
+											onPress={() => handleYesOrNoToMealWithinTheDiet("NO")}
+										>
+											<S.CircleIndicatorRed />
+											<S.MealTypeText>Não</S.MealTypeText>
+										</S.MealTypeOption>
+									</View>
+								</S.RowWrapper>
+							</S.MealTypeOptionsWrapper>
+						</S.Form>
+						<Button
+							disabled={
+								!formIsValid || isEditingAndTheNewValuesAreTheSameAsTheOldValues
 							}
+							label={buttonSubmitLabel}
+							onPress={handleSubmit}
 						/>
-					</S.DescriptionFieldWrapper>
-					<S.RowWrapper>
-						<View style={{ flex: 1 }}>
-							<TextInputComponent
-								label="Data"
-								maxLength={10}
-								onChangeText={handleChangeDate}
-								value={dateMask(formValues.date)}
-								errorMessage={
-									errors.find((err) => err.field === "date")?.message
-								}
-							/>
-						</View>
-						<View style={{ flex: 1 }}>
-							<TextInputComponent
-								label="Hora"
-								maxLength={5}
-								onChangeText={handleChangeHour}
-								value={hourMask(formValues.hour)}
-								errorMessage={
-									errors.find((err) => err.field === "hour")?.message
-								}
-							/>
-						</View>
-					</S.RowWrapper>
-					<S.MealTypeOptionsWrapper>
-						<S.MealTypeSelectLabel>Está dentro da dieta?</S.MealTypeSelectLabel>
-						<S.RowWrapper>
-							<View style={{ flex: 1 }}>
-								<S.MealTypeOption
-									type={formValues.mealType}
-									isSelected={formValues.mealType === "YES"}
-									onPress={() => handleYesOrNoToMealWithinTheDiet("YES")}
-								>
-									<S.CircleIndicatorGreen />
-									<S.MealTypeText>Sim</S.MealTypeText>
-								</S.MealTypeOption>
-							</View>
-							<View style={{ flex: 1 }}>
-								<S.MealTypeOption
-									type={formValues.mealType}
-									isSelected={formValues.mealType === "NO"}
-									onPress={() => handleYesOrNoToMealWithinTheDiet("NO")}
-								>
-									<S.CircleIndicatorRed />
-									<S.MealTypeText>Não</S.MealTypeText>
-								</S.MealTypeOption>
-							</View>
-						</S.RowWrapper>
-					</S.MealTypeOptionsWrapper>
-				</S.Form>
-				<Button
-					disabled={
-						!formIsValid || isEditingAndTheNewValuesAreTheSameAsTheOldValues
-					}
-					label={buttonSubmitLabel}
-					onPress={handleSubmit}
-				/>
-			</S.Wrapper>
-		</ScreenDetailsWrapper>
+					</S.Wrapper>
+				</ScreenDetailsWrapper>
+			</TouchableWithoutFeedback>
+		</KeyboardAvoidingView>
 	);
 }
